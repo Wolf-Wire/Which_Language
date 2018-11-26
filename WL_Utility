@@ -1,0 +1,387 @@
+/* prog3WhichLangMacbeth.cpp        Use letter frequency counts to determine what language text is in.
+
+ Author: Nick Wolf
+ Date: Oct 18, 2018
+ Language: C++
+
+The program uses variuos functions and variables to first calculate the letter frequencies of the input, then sort them into an array
+and finally compare them with the key for language frequencies that programs calculates base on 8 translations of Macbeth. The detailes
+description of each function, loop, and variable can be found next to them.*/
+
+#include <iostream>     // For cin and cout
+#include <cctype>       // For the letter checking functions
+#include <fstream>	   // For file input
+#include <iomanip>      // For setw
+#include <cstdlib>      // For exit()
+using namespace std;
+#define LIMIT 26          // Max array size, which is number of alphabet	
+// *** Arvan: Variables should always have the smaller scope possible. Don't use global variables.
+int lettersArray[LIMIT];  // Tmeplate for the program base which is the alphabet letters
+char c = ' ';             // input character
+int i,j;
+
+void headerPrint () {     // Function that prints the header with name of languages supported
+  cout << "     Engl  Finn  Fren  Germ  Hung  Ital  Port  Span" ;  
+}
+
+int * freqCounter (string fileName) {  // Function that checks for the alphabet letters and incremnets accordingly
+   ifstream inputFileStream;           // takes a file as input, declare the input file stream
+
+   int i;               // loop counter  
+   inputFileStream.open(fileName.c_str());    // open input file and verify 
+   if(!inputFileStream.is_open()) {           // Convert C++ string to expected C-style string
+   	 cout << "Could not find input file.  Exiting..." << endl;
+   	 exit(-1);
+   }     
+   for (i=0; i<LIMIT; i++) {           // initialize lettersArray count values
+      lettersArray [i] = 0;
+   }
+
+   while( inputFileStream >> c) {           
+      if( isalpha(c)) {               // convert alphabetic input characters to upper case
+          c = toupper(c);
+          lettersArray[c-'A']++;      // update letter count, using the character as the index
+      }
+   } 
+   return 0;   
+}
+
+void userCounter (char x[], int count[]) {   // Function that check input for alphabet frequency       
+   const int size = 10000;                   // constant for the size of user input = a paragraph
+   for (int i=0; i<LIMIT; i++) {                 // intializing count array with 0s
+      count [i] = 0;
+   }  
+   for(int i = 0; i < size; i++ ) {              // convert alphabetic input characters to upper case
+       x[i] = toupper(x[i]);
+       count [x[i]-'A']++;                   // update letter count, using the character as the index      
+   }    
+}
+
+// *** Arvan: Try to decompose program into different/more meaningful functions
+int main()            // the main function's explanations can be found in progaram's description above 
+{
+  cout << "Program 3: Which Language." << endl;   // program's name and menu options
+  cout << endl << "Select from the following stages of output to display:" << endl;
+  cout << "   1. Letter frequency counts" << endl;
+  cout << "   2. Letter frequency order" << endl
+       << "   3. Get user input and display frequency counts" << endl
+       << "   4. Get user input, display frequency counts, and display language" << endl
+       << "   0. Exit the program" << endl;
+  cout << "Your choice --> " ;
+
+  int menu;         // the user's choice in menu
+  cin >> menu;      // getting user's input
+    
+  int freqTable [LIMIT][8];       //the 2d array for step 1, shows the frequency of each letter
+  char alphaTable [LIMIT][8];     //the 2d array to sort the numbers in acsending order showing their correspondant letter
+  
+// *** Arvan: Follow the DRY (“Don’t Repeat Yourself) principle.
+// *** Arvan: This section could have been done using arrays/multi-dimensional arrays.
+  freqCounter ("MacbethEnglish.txt");     // calling the freqCounter function eight time (for 8 languages) to ope, analyse, and close each file
+  for (int i = 0; i < LIMIT; i++) {
+    freqTable [i][0] = lettersArray [i];  //converting the frequency counts to a column of the 2d array  
+  }    
+  freqCounter ("MacbethFinnish.txt");     // Doing the same for Finish Language
+  for (int i = 0; i < LIMIT; i++) {
+    freqTable [i][1] = lettersArray [i];
+  }
+  freqCounter ("MacbethFrench.txt");      // Doing the same for French Language
+  for (int i = 0; i < LIMIT; i++) {
+    freqTable [i][2] = lettersArray [i];
+  }
+  freqCounter ("MacbethGerman.txt");      // Doing the same for German Language
+  for (int i = 0; i < LIMIT; i++) {
+    freqTable [i][3] = lettersArray [i];
+  }
+  freqCounter ("MacbethHungarian.txt");   // Doing the same for Hungarian Language
+  for (int i = 0; i < LIMIT; i++) {
+    freqTable [i][4] = lettersArray [i];
+  }
+  freqCounter ("MacbethItalian.txt");     // Doing the same for Italian Language
+  for (int i = 0; i < LIMIT; i++) {
+    freqTable [i][5] = lettersArray [i];
+  } 
+  freqCounter ("MacbethPortuguese.txt");  // Doing the same for Portuguese Language
+  for (int i = 0; i < LIMIT; i++) {
+    freqTable [i][6] = lettersArray [i];
+  }  
+  freqCounter ("MacbethSpanish.txt");     // Doing the same for Spanish Language
+  for (int i = 0; i < LIMIT; i++) {
+    freqTable [i][7] = lettersArray [i];
+  }
+  
+  if (menu == 0) {     // chosing 0 in the menu exits the program
+     exit(-1);
+  }
+  else {               // four nested if loops for each of the menu options 1-4     
+     
+     if (menu > 0) {   // option 1 = stage 1       
+// *** Arvan: This section could have been done using functions.
+        cout << endl << "Letter Frequency Counts:" << endl;
+        headerPrint ();                        // calling the print function to print the header statements
+        for (int i = 0; i < LIMIT; i++) {      // printing the frequency table with two for loops for rows and columns 
+          cout << endl << (char)(i + 'A') << ":" << ' ' << setw(6) ;
+          for (int j = 0; j < 8; j++) {
+            cout << setw(6) << freqTable [i][j] ;
+          }  
+        }               
+        cout << endl;        
+        
+        if (menu > 1) {         // option 2 = stage 2+1
+// *** Arvan: This section could have been done using functions.
+           for (int col = 0; col < 8; col++) {   // sorting the last table in order and convert their indeices to charcters
+             for (int row = 0; row < LIMIT; row++) { 
+                 int max = 0;
+                 for (int i = 0; i < LIMIT; i++) {
+                   if (freqTable[i][col] >  max) {
+                     max = freqTable[i][col];
+                     c = i;
+                   }
+                 }
+                 alphaTable [row][col] = c + 'A';  //making a new table with a 2d array for characters
+                 freqTable [c][col] = -1;          // set the previous max to -1
+             }
+           }         
+           cout << endl << "Letter Frequency Order:" << endl;
+           headerPrint();                      // calling the print function to print the header statements
+           for (int i = 0; i < LIMIT; i++) {   //printing the character table
+             cout <<  endl << "   ";
+             for (int j = 0; j < 8; j++) {
+               cout << setw(6) << (char) (alphaTable [i][j]) ;
+             }  
+           } 
+           cout << endl;
+           
+           if (menu > 2) {    // option 3 = stage 3+2+1
+// *** Arvan: This section could have been done using functions.
+             cout << endl << "Copy and paste a paragraph of text to be analyzed, followed by ^z (PC) or ^d (Mac):" << endl;
+             for (i = 0; i < LIMIT; ++i) {   // initializing the array for user input counts
+               lettersArray[i] = 0;
+             }               
+             while(cin >> c) {                // convert alphabetic input characters to upper case               
+               if( isalpha(c)) {              // Only count alphabetic characters
+                   c = toupper(c);            // Convert to upper case
+                   lettersArray[c-'A']++;     // update letter count, using the character as the index
+                 }            
+             }             
+             cout << endl;
+             for (int i=0; i<LIMIT; i++) {
+                 cout << (char)(i + 'A') << ":" << lettersArray[i] << ' ';
+             }              
+             cout << endl;    
+             int userRow [LIMIT];           // array for converting user's frequencies to alphabet letters             
+             for (int row = 0; row < LIMIT; row++) { 
+                int max = -1;
+                 for (int i = 0; i < LIMIT; i++) {
+                   if (lettersArray[i] >  max) {
+                     max = lettersArray[i];
+                     c = i;
+                   }
+                 }
+                 userRow [row] = c + 'A';  
+                 lettersArray [c] = -1;          // set the previous max to -1
+             }                          
+             char userString [LIMIT];
+             for (i=0;i<26;++i){
+                userString [i] = (char)userRow[i];
+             }                           
+             char alphaTablePlusUser [LIMIT][9];  // making and initializing a new 2d array to fit user's column
+             for (i=0;i<26;++i){
+                for (int j = 0; j<9;++j){
+                   alphaTablePlusUser[i][j] = ' ';
+                }
+             }
+             for (i=0; i < LIMIT; ++i) {
+               alphaTablePlusUser [i][8] = userString [i];      // adding user alphabets frequencies as the last column                
+               for (int j =0; j < 8; ++j){                  
+                 alphaTablePlusUser [i][j] = alphaTable [i][j]; // filling the reset with existing table from stage 2
+               }
+             }                          
+             cout << endl << "Letter Frequency Order:" << endl;   
+             cout << "     Engl  Finn  Fren  Germ  Hung  Ital  Port  Span  User" ;                          
+             for (int i = 0; i < LIMIT; i++) {                 //printing the character table
+               cout <<  endl << "   ";
+               for (int j = 0; j < 9; j++) {
+                 cout << setw(6) << (alphaTablePlusUser [i][j]) ;
+               }  
+             } 
+             cout << endl;             
+              
+             if (menu > 3) {  // option 4 = stage 4+3+2+1
+// *** Arvan: This section could have been done using functions.
+                 int diffArray [8];  // an array to store the diffrence of ecah lnaguage with user's
+                 for (i=0;i<8;++i){
+                    diffArray [i] = 0;
+                 }                 
+                 int const treshhold = 5;   // treshhold for more exact result when comparing and ignore the minor changes
+                 
+                 int sum0 = 0;              // converting each language into a 1d array for ease of comparison
+                 char engArray [LIMIT];     // and after trying millions of methods
+                 for (i = 0; i < 26; ++i){  // at this point I was so scared that I decided not to use a loop and do and store 
+                    engArray [i] = ' ';     // them one by one 
+                    engArray [i] = alphaTable [i][0];
+                 }                          // the number after sum in each part corresponds with the language at that column index
+                 for (i = 0 ; i < 26; ++i){ // e.g. sum2 represents the column[2] of the array which is the thirs column: French
+                    for (j = 0; j < 26; ++j) {
+                       if (userString[j] == engArray [i]){
+                          int sub = 0;
+                          sub = abs (i - j);
+                          if (sub >= treshhold) {
+                             sum0 += sub;
+                          }
+                       }
+                    }
+                 }
+                 diffArray[0] = sum0;        // end of the first column (english)
+                 
+                 int sum1 = 0;               // the second column (Finnish) starts ... and so on 
+                 char finArray [LIMIT];
+                 for (i = 0; i < 26; ++i){
+                    finArray [i] = ' ';
+                    finArray [i] = alphaTable [i][1];
+                 }
+                 for (i = 0 ; i < 26; ++i){
+                    for (j = 0; j < 26; ++j) {
+                       if (userString[j] == finArray [i]){
+                          int sub = 0;
+                          sub = abs (i - j);
+                          if (sub >= treshhold) {
+                             sum1 += sub;   
+                          }
+                       }
+                    }
+                 }
+                 diffArray[1] = sum1;
+                 
+                 int sum2 = 0;
+                 char fncArray [LIMIT];
+                 for (i = 0; i < 26; ++i){
+                    fncArray [i] = ' ';
+                    fncArray [i] = alphaTable [i][2];
+                 }
+                 for (i = 0 ; i < 26; ++i){
+                    for (j = 0; j < 26; ++j) {
+                       if (userString[j] == fncArray [i]){
+                          int sub = 0;
+                          sub = abs (i - j);
+                          if (sub >= treshhold) {
+                             sum2 += sub;   
+                          }
+                       }
+                    }
+                 }
+                 diffArray[2] = sum2;
+                 
+                 int sum3 = 0;
+                 char grmArray [LIMIT];
+                 for (i = 0; i < 26; ++i){
+                    grmArray [i] = ' ';
+                    grmArray [i] = alphaTable [i][3];
+                 }
+                 for (i = 0 ; i < 26; ++i){
+                    for (j = 0; j < 26; ++j) {
+                       if (userString[j] == grmArray [i]){
+                          int sub = 0;
+                          sub = abs (i - j);
+                          if (sub >= treshhold) {
+                             sum3 += sub;   
+                          }
+                       }
+                    }
+                 }
+                 diffArray[3] = sum3;                 
+                 
+                 int sum4 = 0;
+                 char hngArray [LIMIT];
+                 for (i = 0; i < 26; ++i){
+                    hngArray [i] = ' ';
+                    hngArray [i] = alphaTable [i][4];
+                 }
+                 for (i = 0 ; i < 26; ++i){
+                    for (j = 0; j < 26; ++j) {
+                       if (userString[j] == hngArray [i]){
+                          int sub = 0;
+                          sub = abs (i - j);
+                          if (sub >= treshhold) {
+                             sum4 += sub;   
+                          }
+                       }
+                    }
+                 }
+                 diffArray[4] = sum4;      
+                 
+                 int sum5 = 0;
+                 char itlArray [LIMIT];
+                 for (i = 0; i < 26; ++i){
+                    itlArray [i] = ' ';
+                    itlArray [i] = alphaTable [i][5];
+                 }
+                 for (i = 0 ; i < 26; ++i){
+                    for (j = 0; j < 26; ++j) {
+                       if (userString[j] == itlArray [i]){
+                          int sub = 0;
+                          sub = abs (i - j);
+                          if (sub >= treshhold) {
+                             sum5 += sub;   
+                          }
+                       }
+                    }
+                 }
+                 diffArray[5] = sum5;      
+                 
+                 int sum6 = 0;
+                 char prtArray [LIMIT];
+                 for (i = 0; i < 26; ++i){
+                    prtArray [i] = ' ';
+                    prtArray [i] = alphaTable [i][6];
+                 }
+                 for (i = 0 ; i < 26; ++i){
+                    for (j = 0; j < 26; ++j) {
+                       if (userString[j] == prtArray [i]){
+                          int sub = 0;
+                          sub = abs (i - j);
+                          if (sub >= treshhold) {
+                             sum6 += sub;   
+                          }
+                       }
+                    }
+                 }
+                 diffArray[6] = sum6;                                      
+
+                 int sum7 = 0;
+                 char spnArray [LIMIT];
+                 for (i = 0; i < 26; ++i){
+                    spnArray [i] = ' ';
+                    spnArray [i] = alphaTable [i][7];
+                 }
+                 for (i = 0 ; i < 26; ++i){
+                    for (j = 0; j < 26; ++j) {
+                       if (userString[j] == spnArray [i]){
+                          int sub = 0;
+                          sub = abs (i - j);
+                          if (sub >= treshhold) {
+                             sum7 += sub;   
+                          }
+                       }
+                    }
+                 }
+                 diffArray[7] = sum7;     // end of the last column
+                 
+                 int min = 1000;     // finding the mean value among the sum of diffrences
+                 int finder = 0;                 
+                 for (i = 0; i < 8; ++i){
+                    if (diffArray[i] < min){
+                       min = diffArray[i];
+                       finder = i;   // replacing the min with its index
+                    }                    
+                 }
+                 // string for storing names of the supported languages                    
+                 string result [8] = {"English", "Finnish", "French", "German", "Hungarian", "Italian", "Portuguese", "Spanish"};
+                 cout << endl << "Language is " << result [finder] << endl;      // labling the index as the language of the text           
+             }                            
+           }
+        }
+     }
+  }  
+  return 0;
+} //end main()
